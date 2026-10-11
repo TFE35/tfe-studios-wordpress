@@ -10,3 +10,7 @@
 
 ## 0.1.0 — supplied starter
 Native theme conversion with CDN Three.js and mailto-only contact. Its supplied notes explicitly say WordPress runtime unverified. It is a source baseline, not an approved production rollback.
+# 0.3.0 — 11 October 2026
+
+Mobile headline and logo touch layout; The Studio label and white section; destination-named directional transitions; touchscreen swipes; full-width mobile service categories; inline mobile process detail. Includes the 0.2.1 static-homepage body.page selector fix and browser regression coverage.
+

@@ -47,3 +47,17 @@ Native anchors for navigation and buttons for actions. Mobile navigation wraps k
 
 ## Motion
 Preserve curtain/swipe/process/filter interactions. Respect reduced motion. Pause WebGL frame scheduling outside Home and while hidden; fall back to the supplied logo if the local bundle or WebGL fails.
+
+
+## Approved mobile refinement — 0.3.0
+The user requested The Studio navigation label and a white Studio section. Runtime
+--studio-bg mirrors --white (#f6f4ef); --studio-ink mirrors --bg (#111316).
+Original artwork, red/gold accents and image wordmarks remain unchanged. The Studio
+keeps a dark floating navigation shell for white-wordmark contrast. DIFFERENT. uses
+solid text and normal spacing instead of overlapping outline glyphs. On phones the
+original logo has a dedicated, centered touch area after the introduction. Page
+transitions name their destination and sweep horizontally in navigation direction.
+Mobile service filters use a full-width All row and equal two-column categories.
+One shared process detail panel sits immediately after the chosen stage on phones,
+and returns to the desktop side-by-side layout at larger widths. #about URLs remain
+compatible. Reduced motion bypasses transition motion and retains static artwork.

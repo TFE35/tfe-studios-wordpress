@@ -4,22 +4,34 @@
     {
       "width": 360,
       "passed": true,
-      "errors": []
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": true
     },
     {
       "width": 390,
       "passed": true,
-      "errors": []
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": true
     },
     {
       "width": 768,
       "passed": true,
-      "errors": []
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": false
     },
     {
       "width": 1440,
       "passed": true,
-      "errors": []
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": false
     },
     {
       "javascriptDisabled": true,
@@ -27,6 +39,9 @@
     },
     {
       "webgl": "hero-visual has-webgl",
+      "touchLogoTilt": true,
+      "touchSwipeBothDirections": true,
+      "destinationCurtain": true,
       "errors": []
     }
   ]

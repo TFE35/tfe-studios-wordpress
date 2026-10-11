@@ -4,6 +4,8 @@
 (() => {
   'use strict';
   const routes = ['home', 'about', 'services', 'portfolio', 'process', 'contact'];
+  const routeNames = {home:'Home',about:'The Studio',services:'Services',portfolio:'Work',process:'Process',contact:'Contact'};
+  let requestedDirection = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const $ = (q, root = document) => root.querySelector(q);
   const $$ = (q, root = document) => [...root.querySelectorAll(q)];
@@ -51,7 +53,7 @@
     const number = String(pageNo).padStart(2, '0');
     $('#indexCurrent').textContent = number;
     $('#curtainNum').textContent = number + ' / 06';
-    $('#footerPage').textContent = route.toUpperCase() + ' / ' + number;
+    $('#footerPage').textContent = routeNames[route].toUpperCase() + ' / ' + number;
     $$('.desktop-nav a').forEach(a => {
       const isActive = a.dataset.nav === route;
       a.classList.toggle('active', isActive);
@@ -59,7 +61,8 @@
     });
     $('#prevPage').title = 'Previous: ' + routes[(pageNo+4)%routes.length];
     $('#nextPage').title = 'Next: ' + routes[pageNo%routes.length];
-    document.title = 'TFE Studios — ' + route[0].toUpperCase() + route.slice(1);
+    document.title = 'TFE Studios — ' + routeNames[route];
+    document.body.classList.toggle('studio-view',route==='about');
     header.classList.remove('hide-header');
     header.classList.remove('scrolled');
     $('#pageProgress').style.width = '0%';
@@ -92,9 +95,15 @@
     closeMenu();
     if (route === activePage && !animating) return;
     if (animating) { pendingPage = route; return; }
+    const direction = requestedDirection || (routes.indexOf(route)>routes.indexOf(activePage)?'forward':'backward');
+    requestedDirection = null;
+    $('#curtainTitle').textContent = routeNames[route].toUpperCase();
+    $('#curtainNum').textContent = String(routes.indexOf(route)+1).padStart(2,'0')+' / 06';
+    curtain.dataset.direction = direction;
     if (prefersReducedMotion.matches) { activate(route, focus); return; }
     animating = true;
-    curtain.classList.remove('exit');
+    curtain.classList.remove('exit','enter');
+    void curtain.offsetWidth;
     curtain.classList.add('enter');
     setTimeout(() => {
       activate(route, focus);
@@ -108,8 +117,8 @@
           pendingPage = null;
           navigate(p, false);
         } else pendingPage = null;
-      }, 640);
-    }, 620);
+      }, 460);
+    }, 460);
   }
   window.addEventListener('hashchange', () => navigate(safeRoute(), true));
   $$('a[href^="#"]').forEach(a => a.addEventListener('click', event => {
@@ -124,8 +133,9 @@
     if (isOpen) $('.mobile-menu a').focus();
   });
   menu.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
-  $('#prevPage').addEventListener('click', () => { window.location.hash = routes[(routes.indexOf(activePage)+5)%routes.length]; });
-  $('#nextPage').addEventListener('click', () => { window.location.hash = routes[(routes.indexOf(activePage)+1)%routes.length]; });
+  function adjacentPage(forward) { requestedDirection=forward?'forward':'backward';window.location.hash=routes[(routes.indexOf(activePage)+(forward?1:5))%routes.length]; }
+  $('#prevPage').addEventListener('click', () => adjacentPage(false));
+  $('#nextPage').addEventListener('click', () => adjacentPage(true));
   menu.inert = true;
   document.addEventListener('keydown', event => {
     if (event.key === 'Tab' && document.body.classList.contains('menu-open')) {
@@ -134,16 +144,16 @@
       event.preventDefault(); links[(current + (event.shiftKey ? links.length - 1 : 1)) % links.length].focus(); return;
     }
     if (event.key === 'Escape') { closeMenu(); return; }
-    const editing = event.target.closest('input, textarea, select, button, [contenteditable]');
+    const editing = event.target.closest('input, textarea, select, button, canvas, [contenteditable]');
     if (editing || document.body.classList.contains('menu-open') || event.altKey || event.metaKey || event.ctrlKey) return;
-    if (event.key === 'ArrowRight') window.location.hash = routes[(routes.indexOf(activePage)+1)%routes.length];
-    if (event.key === 'ArrowLeft') window.location.hash = routes[(routes.indexOf(activePage)+5)%routes.length];
+    if (event.key === 'ArrowRight') adjacentPage(true);
+    if (event.key === 'ArrowLeft') adjacentPage(false);
   });
   // Horizontal swipes navigate only when primarily horizontal; page scrolling remains normal.
   let touch = null;
   content.addEventListener('touchstart', e => {
     touch = null;
-    if (e.touches.length !== 1 || e.target.closest('a,input,button,select,textarea,.filter-bar,.process-list')) return;
+    if (animating || document.body.classList.contains('menu-open') || e.touches.length !== 1 || e.target.closest('a,input,button,select,textarea,.hero-visual,.filter-bar,.process-list')) return;
     touch = {x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()};
   }, {passive:true});
   content.addEventListener('touchcancel', () => {touch=null;}, {passive:true});
@@ -151,9 +161,8 @@
     if (!touch || e.changedTouches.length !== 1) return;
     const dx = e.changedTouches[0].clientX - touch.x;
     const dy = e.changedTouches[0].clientY - touch.y;
-    if (Math.abs(dx)>110 && Math.abs(dx)>Math.abs(dy)*1.7 && Date.now()-touch.t<850) {
-      const i=routes.indexOf(activePage);
-      window.location.hash=routes[(i+(dx<0?1:5))%routes.length];
+    if (Math.abs(dx)>65 && Math.abs(dx)>Math.abs(dy)*1.7 && Date.now()-touch.t<850) {
+      adjacentPage(dx<0);
     }
     touch=null;
   }, {passive:true});
@@ -198,6 +207,17 @@
     {label:'REVIEW & REVISIONS',title:'WE PUSH IT FURTHER.',body:'Your feedback meets our creative standards. We iterate, refine, review quality and make sure every detail tells the right story.',glyph:'✦'},
     {label:'DELIVERY & SUPPORT',title:'MAKE IT MATTER.',body:'Final assets, launch support and learning from results help the work live well beyond delivery day.',glyph:'◎'}
   ];
+  const processMobile=window.matchMedia('(max-width:620px)');
+  const processDetail=$('#processDetail');
+  const processLayout=$('.process-layout');
+  function placeProcessDetail(scroll=false) {
+    const selected=$('.process-step.active');
+    if(processMobile.matches) selected.after(processDetail);
+    else processLayout.append(processDetail);
+    if(scroll && processMobile.matches) selected.scrollIntoView({block:'start',behavior:prefersReducedMotion.matches?'instant':'smooth'});
+  }
+  processMobile.addEventListener('change',()=>placeProcessDetail());
+  placeProcessDetail();
   $$('.process-step').forEach(btn => btn.addEventListener('click', () => {
     const i=Number(btn.dataset.step),stage=steps[i];
     $$('.process-step').forEach(x=>{const on=x===btn;x.classList.toggle('active',on);x.setAttribute('aria-expanded',String(on));x.querySelector('b').textContent=on?'−':'+';});
@@ -207,6 +227,7 @@
     $('#processDoodle').textContent=stage.glyph;
     $('#processDoodle').style.transform='rotate('+(i*31)+'deg)';
     $('#processTrack').style.width=((i+1)*20)+'%';
+    placeProcessDetail(true);
   }));
   $('#year').textContent=new Date().getFullYear();
   activate(safeRoute());
@@ -218,6 +239,7 @@
   async function initThree() {
     const visual=$('.hero-visual');
     const canvas=$('#threeCanvas');
+    canvas.tabIndex=-1;
     if(prefersReducedMotion.matches){$('#threeStatus').textContent='Original TFE Studios logo shown without motion (accessibility preference).';return;}
     let THREE;
     try { THREE=await import(window.tfeSite.threeUrl); }
@@ -257,14 +279,20 @@
     const key=new THREE.PointLight(0xffd8a0,100,20);key.position.set(-4,5,7);scene.add(key);
     const rim=new THREE.PointLight(0xff8d49,135,20);rim.position.set(5,-2,4);scene.add(rim);
     let mx=0,my=0,smx=0,smy=0,enabled=true,last=0,frameId=null;
-    const onMove=(e)=>{if(activePage!=='home'||e.pointerType!=='mouse')return;const rect=visual.getBoundingClientRect();mx=Math.max(-1,Math.min(1,(e.clientX-rect.left)/rect.width*2-1));my=Math.max(-1,Math.min(1,(e.clientY-rect.top)/rect.height*2-1));};
+    let dragging=false;
+    const onMove=(e)=>{if(activePage!=='home'||(e.pointerType!=='mouse'&&!dragging))return;const rect=visual.getBoundingClientRect();mx=Math.max(-1,Math.min(1,(e.clientX-rect.left)/rect.width*2-1));my=Math.max(-1,Math.min(1,(e.clientY-rect.top)/rect.height*2-1));canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);};
     window.addEventListener('pointermove',onMove,{passive:true});
-    function resize(){const r=visual.getBoundingClientRect();const w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();sculpture.scale.setScalar(w<550?.78:1.00);sculpture.position.x=w<550?.77:.64;}
+    canvas.addEventListener('pointerdown',e=>{if(!e.isPrimary)return;dragging=true;canvas.setPointerCapture(e.pointerId);onMove(e);});
+    const release=()=>{dragging=false;mx=0;my=0;};
+    canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);canvas.addEventListener('lostpointercapture',release);
+    canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key))return;e.preventDefault();if(e.key==='Home'){mx=0;my=0;}else if(e.key==='ArrowLeft')mx=Math.max(-1,mx-.3);else if(e.key==='ArrowRight')mx=Math.min(1,mx+.3);else if(e.key==='ArrowUp')my=Math.max(-1,my-.3);else my=Math.min(1,my+.3);canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);});
+    function resize(){const r=visual.getBoundingClientRect();const w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();sculpture.scale.setScalar(w<550?.68:1.00);sculpture.position.x=w<550?0:.64;}
     window.addEventListener('resize',resize,{passive:true});resize();
     const shouldRun = () => enabled && textureReady && !document.hidden && activePage==='home' && !prefersReducedMotion.matches;
     function syncMotion() {
       const run=shouldRun();
       visual.classList.toggle('has-webgl', enabled && textureReady && !prefersReducedMotion.matches);
+      canvas.tabIndex=enabled && textureReady && !prefersReducedMotion.matches?0:-1;
       if(run && frameId===null){resize();frameId=requestAnimationFrame(frame);}
       if(!run && frameId!==null){cancelAnimationFrame(frameId);frameId=null;}
     }
