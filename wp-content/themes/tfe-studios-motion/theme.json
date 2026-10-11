@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 2,
+  "settings": {
+    "color": {"palette": [
+      {"slug": "charcoal", "name": "TFE Charcoal", "color": "#27292B"},
+      {"slug": "near-black", "name": "TFE Deep Charcoal", "color": "#111316"},
+      {"slug": "red", "name": "TFE Red", "color": "#DA121B"},
+      {"slug": "orange", "name": "TFE Orange", "color": "#DA7F27"},
+      {"slug": "gold", "name": "TFE Gold", "color": "#E3A13C"},
+      {"slug": "white", "name": "TFE White", "color": "#F6F4EF"}
+    ]},
+    "layout": {"contentSize": "800px", "wideSize": "1440px"}
+  }
+}

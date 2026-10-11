@@ -1,0 +1,59 @@
+{
+  "scope": "Local WordPress Playground 6.8, PHP 8.3, SQLite; not managed hosting",
+  "results": [
+    {
+      "width": 360,
+      "passed": true,
+      "errors": [],
+      "rest": {
+        "tokenStatus": 200,
+        "cache": "no-store, private, max-age=0",
+        "disabledStatus": 503,
+        "enabled": false
+      }
+    },
+    {
+      "width": 390,
+      "passed": true,
+      "errors": [],
+      "rest": {
+        "tokenStatus": 200,
+        "cache": "no-store, private, max-age=0",
+        "disabledStatus": 503,
+        "enabled": false
+      }
+    },
+    {
+      "width": 768,
+      "passed": true,
+      "errors": [],
+      "rest": {
+        "tokenStatus": 200,
+        "cache": "no-store, private, max-age=0",
+        "disabledStatus": 503,
+        "enabled": false
+      }
+    },
+    {
+      "width": 1440,
+      "passed": true,
+      "errors": [],
+      "rest": {
+        "tokenStatus": 200,
+        "cache": "no-store, private, max-age=0",
+        "disabledStatus": 503,
+        "enabled": false
+      }
+    },
+    {
+      "javaScriptDisabled": true,
+      "sectionsAvailable": true,
+      "submitDisabled": true
+    },
+    {
+      "webgl": true,
+      "contextLossFallback": true,
+      "errors": []
+    }
+  ]
+}

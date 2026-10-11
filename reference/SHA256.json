@@ -1,0 +1,90 @@
+[
+  {
+    "path": "reference/brand-originals/TFE Studios Black And White.png",
+    "sha256": "38bf87e43e0e6cc74c51a75789f3c17fab974aca83752e694186073c0f35ae37"
+  },
+  {
+    "path": "reference/brand-originals/TFE Studios new.png",
+    "sha256": "ce4b0815bd70a6adca216280cf45d9cceb6ba317164d8de42564f8190c2100c7"
+  },
+  {
+    "path": "reference/brand-originals/Typeface Black.png",
+    "sha256": "58468330add3dc23b86b1b94de4c9b8a6f8f3eb096bad0060b4be6bddc2661b6"
+  },
+  {
+    "path": "reference/brand-originals/TypoFace White-01.png",
+    "sha256": "e7fe20c5bfd9bdf7b0da42b85653077c3bd9060fcb50025316d63ef6c6e9498b"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/AGENTS.md",
+    "sha256": "9c6f570a524e836a7c5b5fdb0441d1923164ecc40201d27d9bad258478558e2e"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/LOGO_OUTLINE_SOURCE.json",
+    "sha256": "83af66cee6aca4d91ee7166f149147af73892bc20bb6817201428dff57ec1b8a"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/TFE-Studios-Black-Wordmark.png",
+    "sha256": "f268019d32f44d6a4c3049aff2971682eadee6f8f490ef8ec35c7e0542064096"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/TFE-Studios-Mono-Logo.png",
+    "sha256": "51826129167e483c002ac88e7b36ffa5dd38eb951fb25368992b399554f5158e"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/TFE-Studios-Official-Logo.png",
+    "sha256": "60ed94caf0cae88c7542f616a3d919fac08982dd20c0dadd2f11a92515589b95"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/TFE-Studios-White-Header-Wordmark.png",
+    "sha256": "ef851bb6d6097cd4710799ea387a32ed412ee184feb1cde2818e416bafc2cea4"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/assets/TFE-Studios-White-Wordmark.png",
+    "sha256": "5f1128146313eebc78146c273df50a3d1efa6b874c35dc6847c6272c04f5658b"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/footer.php",
+    "sha256": "90eca5a4e5ded1130a5106de9b31c13c535a2d2dcfc361c19c858049ab499ce9"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/front-page.php",
+    "sha256": "b075457a910f6a7d03fa104a89ab290183e7f6c580755db80a76795b529fdecc"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/functions.php",
+    "sha256": "947a171344d7eac33c1a5de0158d7401f3b6690c8eafb3cfcf07e2ff69ec8af1"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/header.php",
+    "sha256": "457b76c7b7a43dadf6860c95b620516e4934d5b749774f2a674ca6878e22ab4c"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/index.php",
+    "sha256": "f64071b2832b2a7230c1302ddfcbd91cdba7d885da98d51d9ec7c53709599edc"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/js/app.js",
+    "sha256": "193888551508ecb4e62d1e2ac6e5a29634b4c286786abc7356a4b7a056662944"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/README.md",
+    "sha256": "70484d35ce0c2f08a4ceecee4efbc529aabe84802f06e50c04e6f01de3b38af2"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/screenshot.png",
+    "sha256": "a544c45cdbd7df95633346eba082ee0a588db1970280faccb3b6df5f034c9307"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/style.css",
+    "sha256": "906df0485c9e0a1043cb9ba9b33a52f00850e73d95fb00096ed6140ea59a3b09"
+  },
+  {
+    "path": "reference/starter-v0.1.0/tfe-studios-motion/theme.json",
+    "sha256": "7504d3e43e8640d5a003d14589e5e8e5d3b58d1bf4a540fd409bf98628653d42"
+  },
+  {
+    "path": "reference/v3.1/index.html",
+    "sha256": "3780eb6ec4dbd4abd337c21c3ccbe3579e9e9265266f2ab051ca77e24fd04727"
+  }
+]
