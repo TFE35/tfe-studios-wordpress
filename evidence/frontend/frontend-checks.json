@@ -39,7 +39,8 @@
     },
     {
       "webgl": "hero-visual has-webgl",
-      "touchLogoTilt": true,
+      "mobileTapAndKeyboard": true,
+      "desktopPointerTilt": true,
       "touchSwipeBothDirections": true,
       "destinationCurtain": true,
       "errors": []

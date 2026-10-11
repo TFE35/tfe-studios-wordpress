@@ -61,3 +61,12 @@ Mobile service filters use a full-width All row and equal two-column categories.
 One shared process detail panel sits immediately after the chosen stage on phones,
 and returns to the desktop side-by-side layout at larger widths. #about URLs remain
 compatible. Reduced motion bypasses transition motion and retains static artwork.
+
+### Mobile hero refinement — 0.3.1
+The user requested the mobile headline beside the logo with a small overlap. At
+620px and below the headline occupies the left foreground and the centered emblem
+occupies the right. The introduction stays underneath. Mobile Three.js uses a
+separate camera and subtle idle motion; tap or Enter/Space gives a short yaw and
+returns to its front view. Horizontal drags in that stage do not navigate pages.
+Desktop camera, pointer tracking and animation formulas stay unchanged. Static
+fallback artwork is preserved for reduced motion and unavailable WebGL.

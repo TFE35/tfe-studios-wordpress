@@ -1,3 +1,7 @@
+# 0.3.1 — 11 October 2026
+
+Mobile headline beside and slightly over the original logo. Separate mobile Three.js camera and tap/keyboard tilt response; desktop pointer animation retained.
+
 # Developer changes
 
 ## 0.2.0 — staging candidate
@@ -13,4 +17,3 @@ Native theme conversion with CDN Three.js and mailto-only contact. Its supplied 
 # 0.3.0 — 11 October 2026
 
 Mobile headline and logo touch layout; The Studio label and white section; destination-named directional transitions; touchscreen swipes; full-width mobile service categories; inline mobile process detail. Includes the 0.2.1 static-homepage body.page selector fix and browser regression coverage.
-

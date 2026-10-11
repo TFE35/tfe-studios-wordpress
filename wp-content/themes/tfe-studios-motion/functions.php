@@ -5,7 +5,7 @@
  */
 if (!defined('ABSPATH')) { exit; }
 
-define('TFE_THEME_VERSION', '0.3.0');
+define('TFE_THEME_VERSION', '0.3.1');
 
 function tfe_theme_setup() {
     add_theme_support('title-tag');

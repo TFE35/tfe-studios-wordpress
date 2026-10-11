@@ -279,14 +279,16 @@
     const key=new THREE.PointLight(0xffd8a0,100,20);key.position.set(-4,5,7);scene.add(key);
     const rim=new THREE.PointLight(0xff8d49,135,20);rim.position.set(5,-2,4);scene.add(rim);
     let mx=0,my=0,smx=0,smy=0,enabled=true,last=0,frameId=null;
-    let dragging=false;
-    const onMove=(e)=>{if(activePage!=='home'||(e.pointerType!=='mouse'&&!dragging))return;const rect=visual.getBoundingClientRect();mx=Math.max(-1,Math.min(1,(e.clientX-rect.left)/rect.width*2-1));my=Math.max(-1,Math.min(1,(e.clientY-rect.top)/rect.height*2-1));canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);};
+    const mobileLogo=window.matchMedia('(max-width:620px)');
+    let dragging=false,tapStart=null,tapAt=-10000;
+    const playLogo=()=>{if(activePage!=='home'||!mobileLogo.matches)return;tapAt=performance.now();canvas.dataset.tap=String(tapAt);};
+    const onMove=(e)=>{if(mobileLogo.matches||activePage!=='home'||(e.pointerType!=='mouse'&&!dragging))return;const rect=visual.getBoundingClientRect();mx=Math.max(-1,Math.min(1,(e.clientX-rect.left)/rect.width*2-1));my=Math.max(-1,Math.min(1,(e.clientY-rect.top)/rect.height*2-1));canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);};
     window.addEventListener('pointermove',onMove,{passive:true});
-    canvas.addEventListener('pointerdown',e=>{if(!e.isPrimary)return;dragging=true;canvas.setPointerCapture(e.pointerId);onMove(e);});
+    canvas.addEventListener('pointerdown',e=>{if(!e.isPrimary)return;if(mobileLogo.matches){tapStart={x:e.clientX,y:e.clientY,time:performance.now()};return;}dragging=true;canvas.setPointerCapture(e.pointerId);onMove(e);});
     const release=()=>{dragging=false;mx=0;my=0;};
-    canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);canvas.addEventListener('lostpointercapture',release);
-    canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key))return;e.preventDefault();if(e.key==='Home'){mx=0;my=0;}else if(e.key==='ArrowLeft')mx=Math.max(-1,mx-.3);else if(e.key==='ArrowRight')mx=Math.min(1,mx+.3);else if(e.key==='ArrowUp')my=Math.max(-1,my-.3);else my=Math.min(1,my+.3);canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);});
-    function resize(){const r=visual.getBoundingClientRect();const w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();sculpture.scale.setScalar(w<550?.68:1.00);sculpture.position.x=w<550?0:.64;}
+    canvas.addEventListener('pointerup',e=>{if(tapStart&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)<14&&performance.now()-tapStart.time<700)playLogo();tapStart=null;release();});canvas.addEventListener('pointercancel',()=>{tapStart=null;release();});canvas.addEventListener('lostpointercapture',release);
+    canvas.addEventListener('keydown',e=>{if(mobileLogo.matches){if(e.key==='Enter'||e.key===' '){e.preventDefault();playLogo();}return;}if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key))return;e.preventDefault();if(e.key==='Home'){mx=0;my=0;}else if(e.key==='ArrowLeft')mx=Math.max(-1,mx-.3);else if(e.key==='ArrowRight')mx=Math.min(1,mx+.3);else if(e.key==='ArrowUp')my=Math.max(-1,my-.3);else my=Math.min(1,my+.3);canvas.dataset.tilt=mx.toFixed(2)+','+my.toFixed(2);});
+    function resize(){const r=visual.getBoundingClientRect();const w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobileLogo.matches?1.3:1.6));renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.z=mobileLogo.matches?8.8:12.3;camera.updateProjectionMatrix();sculpture.scale.setScalar(mobileLogo.matches?.9:(w<550?.68:1.00));sculpture.position.x=mobileLogo.matches?0:(w<550?0:.64);canvas.setAttribute('role',mobileLogo.matches?'button':'img');canvas.setAttribute('aria-label',mobileLogo.matches?'Tap to tilt the TFE Studios 3D logo':'Animated 3D TFE Studios official logo');$('.visual-label').innerHTML=mobileLogo.matches?'TAP TO EXPLORE <span>✳</span>':'MOVE TO EXPLORE <span>✳</span>';}
     window.addEventListener('resize',resize,{passive:true});resize();
     const shouldRun = () => enabled && textureReady && !document.hidden && activePage==='home' && !prefersReducedMotion.matches;
     function syncMotion() {
@@ -310,9 +312,17 @@
       smx+=(mx-smx)*.038;smy+=(my-smy)*.038;
       const time=clock.getElapsedTime();
       // Distinctive studio art stays legible: gentle 3D yaw/roll, float and responsive tilt.
-      sculpture.rotation.y=Math.sin(time*.27)*.22 + smx*.30;
-      sculpture.rotation.x=Math.sin(time*.31)*.10-smy*.20;
-      sculpture.rotation.z=Math.sin(time*.17)*.082;
+      if(mobileLogo.matches){
+        const elapsed=(performance.now()-tapAt)/1000;
+        const pulse=elapsed<1.5?Math.sin(Math.PI*elapsed/1.5):0;
+        sculpture.rotation.y=Math.sin(time*.27)*.07+pulse*.7;
+        sculpture.rotation.x=Math.sin(time*.31)*.035-pulse*.13;
+        sculpture.rotation.z=Math.sin(time*.17)*.025;
+      }else{
+        sculpture.rotation.y=Math.sin(time*.27)*.22 + smx*.30;
+        sculpture.rotation.x=Math.sin(time*.31)*.10-smy*.20;
+        sculpture.rotation.z=Math.sin(time*.17)*.082;
+      }
       orbitA.rotation.z=time*.13;
       orbitB.rotation.y=time*.09;
       points.rotation.z=time*.028;

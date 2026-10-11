@@ -80,13 +80,16 @@ const server=http.createServer((req,res)=>{
  const cdp=await gl.context().newCDPSession(gl);
  async function drag(x1,y1,x2,y2,afterMove){await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:x1,y:y1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x2,y:y2}]});if(afterMove)await afterMove();await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
  await gl.locator('#threeCanvas').scrollIntoViewIfNeeded();const rect=await gl.locator('#threeCanvas').boundingBox();
- await drag(rect.x+rect.width*.3,rect.y+rect.height*.5,rect.x+rect.width*.7,rect.y+rect.height*.5,async()=>assert.ok(await gl.locator('#threeCanvas').getAttribute('data-tilt')));
+ await gl.touchscreen.tap(rect.x+rect.width*.75,rect.y+rect.height*.5);
+ assert.ok(await gl.locator('#threeCanvas').getAttribute('data-tap'));
  assert.equal(await gl.evaluate(()=>location.hash),'');
- await gl.locator('#threeCanvas').focus();await gl.keyboard.press('ArrowRight');assert.ok(await gl.locator('#threeCanvas').getAttribute('data-tilt'));
- await gl.evaluate(()=>scrollTo(0,0));await drag(310,220,110,220);
+ await gl.locator('#threeCanvas').focus();const firstTap=await gl.locator('#threeCanvas').getAttribute('data-tap');await gl.keyboard.press('Enter');assert.notEqual(await gl.locator('#threeCanvas').getAttribute('data-tap'),firstTap);
+ await gl.waitForTimeout(1800);await gl.locator('#threeCanvas').evaluate(el=>el.blur());await gl.screenshot({path:path.join(project,'evidence/frontend','mobile-three-390.png'),fullPage:false});
+ await gl.evaluate(()=>scrollTo(0,0));await drag(310,180,110,180);
  await gl.waitForSelector('#pageCurtain.enter');assert.equal(await gl.locator('#curtainTitle').textContent(),'THE STUDIO');assert.equal(await gl.locator('#pageCurtain').getAttribute('data-direction'),'forward');
  await gl.waitForSelector('#about.is-active');await gl.waitForTimeout(600);await drag(100,220,300,220);await gl.waitForSelector('#pageCurtain.enter');assert.equal(await gl.locator('#curtainTitle').textContent(),'HOME');assert.equal(await gl.locator('#pageCurtain').getAttribute('data-direction'),'backward');await gl.waitForSelector('#home.is-active');
- report.push({webgl:await gl.locator('.hero-visual').getAttribute('class'),touchLogoTilt:true,touchSwipeBothDirections:true,destinationCurtain:true,errors:glerrors});assert.deepEqual(glerrors,[]);
+ const desktop=await browser.newPage({viewport:{width:1440,height:900}});await desktop.goto('http://127.0.0.1:8899/');await desktop.waitForSelector('.hero-visual.has-webgl');await desktop.mouse.move(1200,350);assert.ok(await desktop.locator('#threeCanvas').getAttribute('data-tilt'));assert.equal(await desktop.locator('#threeCanvas').getAttribute('role'),'img');
+ report.push({webgl:await gl.locator('.hero-visual').getAttribute('class'),mobileTapAndKeyboard:true,desktopPointerTilt:true,touchSwipeBothDirections:true,destinationCurtain:true,errors:glerrors});assert.deepEqual(glerrors,[]);
  }finally{await browser.close();server.close();fs.writeFileSync(path.join(project,'evidence/frontend/frontend-checks.json'),JSON.stringify({scope:'Frontend fixture using supplied static markup and active theme CSS/JS/form; not WordPress PHP/runtime evidence',results:report},null,2));}
  console.log(JSON.stringify(report,null,2));
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
