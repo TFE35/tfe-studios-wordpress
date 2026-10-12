@@ -35,9 +35,9 @@
     }
     button.disabled = true;
     form.setAttribute('aria-busy', 'true');
-    status.textContent = files.length ? 'Checking your documents and sending your enquiry…' : 'Sending your enquiry…';
+    status.textContent = files.length ? 'Sending your enquiry and attachments…' : 'Sending your enquiry…';
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), files.length ? 90000 : 20000);
+    const timeout = setTimeout(() => controller.abort(), files.length ? 60000 : 20000);
     try {
       const token = await fetch(window.tfeSite.tokenUrl, {cache:'no-store',signal:controller.signal});
       if (!token.ok) throw new Error('Please refresh and try again, or use email.');

@@ -21,3 +21,7 @@ Mobile headline and logo touch layout; The Studio label and white section; desti
 ## 0.4.0
 - Website enquiries submit directly through WordPress/SMTP; disabled delivery no longer opens a mail draft automatically.
 - Optional bounded uploads with private on-host ClamAV scanning, rejection on incomplete scans, and temporary-file cleanup. Attachments default off pending host verification.
+
+## 0.5.0
+- User requested attachments without a scanner. Remove ClamAV dependency and scanning claims. Retain limits, MIME/DOCX checks, private temporary storage and cleanup.
+- Default private directory is a site-specific owner-only directory under PHP temporary storage, never public uploads. Admin activation and privacy review remain required.

@@ -72,4 +72,7 @@ Desktop camera, pointer tracking and animation formulas stay unchanged. Static
 fallback artwork is preserved for reduced motion and unavailable WebGL.
 
 ## Contact documents
-Optional native multiple-file picker follows the contact form styles. Inline type/size errors retain visitor input; a live status reports scanning/sending, rejection or mail acceptance. Attachments disabled until configured; the explicit email link remains available. No automatic mail app navigation.
+Optional native multiple-file picker follows the contact form styles. Inline type/size errors retain visitor input; a live status reports sending, rejection or mail acceptance. Attachments disabled until configured; the explicit email link remains available. No automatic mail app navigation.
+
+### v0.5.0 decision
+User requested uploads without scanning. Frontend and administrator copy explicitly say attachments are not virus-scanned. Existing file controls and input retention remain. No antivirus safety claim.

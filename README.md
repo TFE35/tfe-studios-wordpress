@@ -1,6 +1,6 @@
 # TFE Studios WordPress
 
-Native theme v0.4.0 **staging candidate**, based on supplied v3.1. No production deployment is performed. Company documents are excluded from this public repository. Direct enquiries and private attachment scanning setup are documented in [ATTACHMENTS.md](ATTACHMENTS.md); uploads stay disabled pending host verification.
+Native theme v0.5.0 **staging candidate**, based on supplied v3.1. No production deployment is performed. Company documents are excluded from this public repository. Direct enquiries and private attachment setup without antivirus scanning are documented in [ATTACHMENTS.md](ATTACHMENTS.md); uploads stay disabled pending host verification.
 
 - Theme: wp-content/themes/tfe-studios-motion
 - Immutable reference: reference/v3.1/index.html

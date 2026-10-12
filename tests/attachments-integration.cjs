@@ -1,11 +1,9 @@
-// Native PHP multipart integration; scanner is an explicitly labelled local stub.
+// Native PHP multipart integration without any antivirus scanner.
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict'),{spawn,spawnSync}=require('node:child_process'),net=require('node:net');
 (async()=>{
  const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'tfe-upload-test-'));const priv=path.join(scratch,'private');fs.mkdirSync(priv,{mode:0o700});
- const scanner=path.join(scratch,'scanner');
- fs.writeFileSync(scanner,"#!/usr/bin/env python3\nimport sys,pathlib\np=pathlib.Path(sys.argv[-1]); b=p.read_bytes()\nif b'UNSAFE_TEST' in b: print(str(p)+': Test-Signature FOUND'); sys.exit(1)\nif b'ERROR_TEST' in b: print('scan error',file=sys.stderr); sys.exit(2)\nprint(str(p)+': OK')\n",{mode:0o700});
  const probe=net.createServer();await new Promise(r=>probe.listen(0,'127.0.0.1',r));const port=probe.address().port;await new Promise(r=>probe.close(r));
- const server=spawn('php',['-d','upload_max_filesize=5M','-d','post_max_size=10M','-S',`127.0.0.1:${port}`,path.join(__dirname,'support/upload-router.php')],{env:{...process.env,TFE_TEST_SCANNER:scanner,TFE_TEST_PRIVATE:priv},stdio:['ignore','ignore','pipe']});let logs='';server.stderr.on('data',d=>logs+=d);
+ const server=spawn('php',['-d','upload_max_filesize=5M','-d','post_max_size=10M','-S',`127.0.0.1:${port}`,path.join(__dirname,'support/upload-router.php')],{env:{...process.env,TFE_TEST_PRIVATE:priv},stdio:['ignore','ignore','pipe']});let logs='';server.stderr.on('data',d=>logs+=d);
  const url=`http://127.0.0.1:${port}`;let ready=false;
  try{
   for(let i=0;i<100;i++){try{await fetch(url);ready=true;break}catch{await new Promise(r=>setTimeout(r,50));}}
@@ -21,9 +19,9 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
    assert.equal(generated.status,0,generated.stderr.toString());return {name:'brief.docx',bytes:generated.stdout};
   }
   let r=await send([pdf('clean fixture')]);assert.equal(r.status,200);assert.equal(r.calls,1);assert.equal(r.attached,1);
-  r=await send([pdf('UNSAFE_TEST')]);assert.equal(r.status,422);assert.equal(r.calls,0);
-  r=await send([pdf('ERROR_TEST')]);assert.equal(r.status,503);assert.equal(r.calls,0);
-  r=await send([pdf('clean'),pdf('UNSAFE_TEST')]);assert.equal(r.calls,0);
+  // Harmless marker is accepted: this flow explicitly performs no antivirus scan.
+  r=await send([pdf('UNSAFE_TEST')]);assert.equal(r.status,200);assert.equal(r.attached,1);
+  r=await send([pdf('automatic private storage')],'?auto_storage=1');assert.equal(r.status,200);assert.equal(r.attached,1);
   r=await send([docx()]);assert.equal(r.status,200);assert.equal(r.attached,1);
   for(const kind of ['macro','embedded','expansion']){r=await send([docx(kind)]);assert.equal(r.status,400);assert.equal(r.calls,0);}
   r=await send([pdf('one'),pdf('two'),pdf('three')]);assert.equal(r.status,200);assert.equal(r.attached,3);
@@ -37,8 +35,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
   r=await send([pdf('clean')],'?cron_failure=1');assert.equal(r.status,503);assert.equal(r.calls,0);
   r=await send([pdf('clean')],'','expired');assert.equal(r.status,403);assert.equal(r.calls,0);
   fs.chmodSync(priv,0o755);r=await send([pdf('clean')]);assert.equal(r.status,503);assert.equal(r.calls,0);fs.chmodSync(priv,0o700);
-  fs.unlinkSync(scanner);r=await send([pdf('clean')]);assert.equal(r.status,503);assert.equal(r.calls,0);
   r=await send();assert.equal(r.status,200);assert.equal(r.attached,0);
-  console.log('PASS: real multipart upload validation, stub clean/rejected/error/missing scans, no dispatch on rejection, and private cleanup after success/failure/exception. No real antivirus or external mail verification claimed.');
+  console.log('PASS: real multipart upload validation, unscanned uploads, no dispatch on validation rejection, and private cleanup after success/failure/exception. No antivirus scanning is performed; no external mail verification claimed.');
  }finally{server.kill();if(server.exitCode===null)await new Promise(r=>server.once('exit',r));assert.equal(path.dirname(path.resolve(scratch)),path.resolve(os.tmpdir()));assert.ok(path.basename(scratch).startsWith('tfe-upload-test-'));fs.rmSync(scratch,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1});

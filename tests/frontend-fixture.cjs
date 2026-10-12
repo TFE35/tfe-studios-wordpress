@@ -14,7 +14,7 @@ html=html.replace('role="img"></canvas>','role="img" tabindex="0"></canvas>');
 const visual=html.match(/  <div class="hero-visual"[^\n]*/)[0];
 html=html.replace(visual,'').replace('  <div class="ticker-wrap">',visual+'\n  <div class="ticker-wrap">');
 html=html.replace(/>ABOUT<\/a>/g,'>THE STUDIO</a>').replace(/>About <span>/g,'>The Studio <span>');
-let form=front.match(/<form id="contactForm"[\s\S]*?<\/form>/)[0].replace(/<\?php[\s\S]*?\?>/g,'');
+let form=front.match(/<form id="contactForm"[\s\S]*?<\/form>/)[0].replace(/<\?php[\s\S]*?\?>/g,'').replace('8 MB total. ','8 MB total. Attachments are not virus-scanned. ');
 html=html.replace(/<form id="contactForm"[\s\S]*?<\/form>/,form).replace('<main id="pages">','<main id="pages" tabindex="-1">');
 html=html.replace('</body>','<script src="/js/app.js"></script><script src="/js/contact.js"></script></body>');
 html=html.replace('</head>','<script>/* fixture configuration only */</script></head>');
@@ -56,6 +56,7 @@ const server=http.createServer((req,res)=>{
    await page.route('**/enquiry',r=>r.fulfill({status:502,json:{message:'Mail test failure; use email.'}}));
    await page.locator('.form-submit').click();await page.waitForFunction(()=>document.querySelector('#contactStatus').textContent.includes('Mail test failure'));assert.equal(await page.locator('#contactMessage').inputValue(),'Local test only');
    assert.equal(await page.locator('#contactDocuments').evaluate(el=>el.files.length),1);
+   await page.screenshot({path:path.join(project,'evidence/frontend/contact-unscanned-390.png'),fullPage:true});
    await page.unroute('**/enquiry');await page.route('**/enquiry',r=>{assert.ok(r.request().headers()['content-type'].startsWith('multipart/form-data'));assert.ok(r.request().postDataBuffer().includes(Buffer.from('brief.pdf')));return r.fulfill({json:{message:'Mail service accepted (fixture).'}});});
    await page.locator('.form-submit').click();await page.waitForFunction(()=>document.querySelector('#contactStatus').textContent.includes('Mail service accepted'));assert.equal(await page.locator('#contactMessage').inputValue(),'');
    assert.equal(await page.locator('#contactDocuments').evaluate(el=>el.files.length),0);

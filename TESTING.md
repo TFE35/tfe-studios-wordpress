@@ -35,3 +35,6 @@ Local development rollback smoke test passed: copied the archived v0.1.0 files i
 
 ## v0.4.0 uploads
 CI adds `node tests/attachments-integration.cjs` with native PHP 8.3, fileinfo and ZipArchive. Real HTTP multipart uploads exercise clean/rejected/error/missing stub scanner responses, file type/size/count/total limits, DOCX structure/macros/embeddings/expansion checks, private directory permissions, no-mail-on-rejection and cleanup on mail success/failure/exception. The scanner is a local deterministic stub; no real antivirus efficacy or SMTP receipt is asserted. The browser fixture also verifies inline file errors, multipart submission, input retention after failure and reset after acceptance. Managed staging and real scanner/delivery checks remain pending.
+
+## v0.5.0 uploads without scanning
+The current native multipart suite uses no scanner. It checks PDF/DOCX delivery, three-file attachments, MIME/extension/count/size/total bounds, DOCX macro/embedding/expansion rejection, directory permissions, nonce and cleanup scheduling failures, plus cleanup after mail success/failure/exception. A harmless PDF marker previously rejected by the test scanner is now accepted to verify the explicit no-scanning behavior. Managed-host private storage, privacy publication, inbox attachment receipt and reply remain pending.

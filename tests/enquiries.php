@@ -37,7 +37,7 @@ expect_error(array_merge($base,array('consent'=>'')),'invalid');
 expect_error(array_merge($base,array('service'=>'unsupported')),'invalid');
 expect_error(array_merge($base,array('email'=>"visitor@example.org\r\nBcc: victim@example.org")),'invalid');
 $bad=tfe_receive_enquiry(new Request($base,array('documents'=>array('name'=>array('test.pdf'),'tmp_name'=>array('/tmp/untrusted'),'size'=>array(5),'error'=>array(0)))));
-if(!($bad instanceof WP_Error)||$bad->code!=='scanner'||$calls!==0)throw new Exception('Uploads must fail closed without configured scanner');
+if(!($bad instanceof WP_Error)||$bad->code!=='uploads'||$calls!==0)throw new Exception('Uploads must fail closed without private storage');
 $transients=array();$options=array();
 if($calls!==0)throw new Exception('Invalid input dispatched email');
 $r=tfe_receive_enquiry(new Request($base));if(!($r instanceof WP_REST_Response)||$calls!==1)throw new Exception('Valid request failed');
