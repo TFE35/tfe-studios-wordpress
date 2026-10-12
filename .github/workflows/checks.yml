@@ -1,0 +1,30 @@
+name: Theme checks
+on:
+  pull_request:
+  push:
+    branches: [main, feat/wordpress-production]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: fileinfo, zip
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build && pnpm run lint && pnpm run test
+      - run: find wp-content/themes/tfe-studios-motion -name '*.php' -print0 | xargs -0 -n1 php -l
+      - run: php tests/enquiries.php
+      - run: node tests/attachments-integration.cjs
+      - run: mkdir -p dist && cd wp-content/themes && zip -r ../../dist/tfe-studios-motion.zip tfe-studios-motion
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfe-studios-motion-staging
+          path: dist/*.zip

@@ -1,0 +1,5 @@
+{
+  "scope": "Local development file restore smoke test; not a production rollback qualification",
+  "baselineRendered": true,
+  "candidateRestored": true
+}

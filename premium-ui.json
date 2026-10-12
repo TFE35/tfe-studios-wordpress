@@ -1,0 +1,4 @@
+{
+  "sourceRoots": ["wp-content/themes/tfe-studios-motion"],
+  "description": "Active theme only; immutable reference source is excluded from conversion audit. Native service select uses the operating system popup."
+}

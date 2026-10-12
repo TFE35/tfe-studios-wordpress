@@ -1,0 +1,49 @@
+{
+  "scope": "Frontend fixture using supplied static markup and active theme CSS/JS/form; not WordPress PHP/runtime evidence",
+  "results": [
+    {
+      "width": 360,
+      "passed": true,
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": true
+    },
+    {
+      "width": 390,
+      "passed": true,
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": true
+    },
+    {
+      "width": 768,
+      "passed": true,
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": false
+    },
+    {
+      "width": 1440,
+      "passed": true,
+      "errors": [],
+      "staticHomepageBodyVisible": true,
+      "studioWhite": true,
+      "processSelectionInline": false
+    },
+    {
+      "javascriptDisabled": true,
+      "servicesVisible": true
+    },
+    {
+      "webgl": "hero-visual has-webgl",
+      "mobileTapAndKeyboard": true,
+      "desktopPointerTilt": true,
+      "touchSwipeBothDirections": true,
+      "destinationCurtain": true,
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# Preserve archived source bytes, including on Windows checkouts.
+reference/** -text
+*.png -text
+*.php text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.css text eol=lf
