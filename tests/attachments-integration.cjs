@@ -1,5 +1,5 @@
 // Native PHP multipart integration; scanner is an explicitly labelled local stub.
-const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict'),{spawn}=require('node:child_process'),net=require('node:net');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict'),{spawn,spawnSync}=require('node:child_process'),net=require('node:net');
 (async()=>{
  const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'tfe-upload-test-'));const priv=path.join(scratch,'private');fs.mkdirSync(priv,{mode:0o700});
  const scanner=path.join(scratch,'scanner');
@@ -16,20 +16,29 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
    const r=await fetch(url+suffix,{method:'POST',body:f});const d=await r.json();assert.equal(d.remaining,0,'Private temporary file leaked');return {status:r.status,...d};
   }
   const pdf=b=>({name:'brief.pdf',bytes:'%PDF-1.4\n'+b});
+  function docx(extra=''){
+   const generated=spawnSync('python3',['-c',"import io,zipfile,sys\nb=io.BytesIO()\nwith zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:\n z.writestr('[Content_Types].xml','application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml'+('macroEnabled' if sys.argv[1]=='macro' else ''))\n z.writestr('word/document.xml','<document/>')\n if sys.argv[1]=='embedded': z.writestr('word/embeddings/payload.bin','test')\n if sys.argv[1]=='expansion': z.writestr('word/large.xml','x'*(9*1024*1024))\nsys.stdout.buffer.write(b.getvalue())",extra]);
+   assert.equal(generated.status,0,generated.stderr.toString());return {name:'brief.docx',bytes:generated.stdout};
+  }
   let r=await send([pdf('clean fixture')]);assert.equal(r.status,200);assert.equal(r.calls,1);assert.equal(r.attached,1);
   r=await send([pdf('UNSAFE_TEST')]);assert.equal(r.status,422);assert.equal(r.calls,0);
   r=await send([pdf('ERROR_TEST')]);assert.equal(r.status,503);assert.equal(r.calls,0);
   r=await send([pdf('clean'),pdf('UNSAFE_TEST')]);assert.equal(r.calls,0);
+  r=await send([docx()]);assert.equal(r.status,200);assert.equal(r.attached,1);
+  for(const kind of ['macro','embedded','expansion']){r=await send([docx(kind)]);assert.equal(r.status,400);assert.equal(r.calls,0);}
+  r=await send([pdf('one'),pdf('two'),pdf('three')]);assert.equal(r.status,200);assert.equal(r.attached,3);
   r=await send([{name:'brief.pdf',bytes:'<?php echo "disguised";'}]);assert.equal(r.status,400);assert.equal(r.calls,0);
   r=await send([{name:'brief.php',bytes:'%PDF-1.4\n'}]);assert.equal(r.status,400);
   r=await send([pdf('one'),pdf('two'),pdf('three'),pdf('four')]);assert.equal(r.status,400);
   r=await send([pdf('x'.repeat(4*1024*1024))]);assert.equal(r.status,400);
+  r=await send([pdf('x'.repeat(3*1024*1024)),pdf('x'.repeat(3*1024*1024)),pdf('x'.repeat(3*1024*1024))]);assert.equal(r.status,400);assert.equal(r.calls,0);
   r=await send([pdf('clean')],'?mail_failure=1');assert.equal(r.status,502);assert.equal(r.calls,1);
   r=await send([pdf('clean')],'?mail_exception=1');assert.equal(r.status,502);assert.equal(r.calls,1);
   r=await send([pdf('clean')],'?cron_failure=1');assert.equal(r.status,503);assert.equal(r.calls,0);
   r=await send([pdf('clean')],'','expired');assert.equal(r.status,403);assert.equal(r.calls,0);
+  fs.chmodSync(priv,0o755);r=await send([pdf('clean')]);assert.equal(r.status,503);assert.equal(r.calls,0);fs.chmodSync(priv,0o700);
   fs.unlinkSync(scanner);r=await send([pdf('clean')]);assert.equal(r.status,503);assert.equal(r.calls,0);
   r=await send();assert.equal(r.status,200);assert.equal(r.attached,0);
   console.log('PASS: real multipart upload validation, stub clean/rejected/error/missing scans, no dispatch on rejection, and private cleanup after success/failure/exception. No real antivirus or external mail verification claimed.');
- }finally{server.kill();await new Promise(r=>server.once('exit',r));fs.rmSync(scratch,{recursive:true,force:true});}
+ }finally{server.kill();if(server.exitCode===null)await new Promise(r=>server.once('exit',r));assert.equal(path.dirname(path.resolve(scratch)),path.resolve(os.tmpdir()));assert.ok(path.basename(scratch).startsWith('tfe-upload-test-'));fs.rmSync(scratch,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1});

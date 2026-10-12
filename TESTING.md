@@ -32,3 +32,6 @@ Native WordPress content tests also passed for one/multiple Services and Portfol
 No-WebGL simulation on the real local WordPress page at 390px passed: fallback original logo remains visible and no uncaught page errors were observed.
 
 Local development rollback smoke test passed: copied the archived v0.1.0 files into the isolated active theme, verified Services, restored the full v0.2.0 snapshot and verified its configuration and Services. This does not qualify v0.1.0 for production; its known CDN, mailto and no-JavaScript limitations remain.
+
+## v0.4.0 uploads
+CI adds `node tests/attachments-integration.cjs` with native PHP 8.3, fileinfo and ZipArchive. Real HTTP multipart uploads exercise clean/rejected/error/missing stub scanner responses, file type/size/count/total limits, DOCX structure/macros/embeddings/expansion checks, private directory permissions, no-mail-on-rejection and cleanup on mail success/failure/exception. The scanner is a local deterministic stub; no real antivirus efficacy or SMTP receipt is asserted. The browser fixture also verifies inline file errors, multipart submission, input retention after failure and reset after acceptance. Managed staging and real scanner/delivery checks remain pending.
