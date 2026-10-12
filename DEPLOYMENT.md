@@ -18,4 +18,5 @@ Do not install this candidate on www.tfestudios.com during development: the user
 Back up before changing themes. On staging, activate the previous verified theme or upload its saved ZIP, restore compatible theme settings/database if required, purge caches, and verify routes/content/contact. Custom posts remain in the database but this theme's UI is registered by the theme. Test rollback in staging before production. The included original v0.1.0 ZIP passed a local development restore smoke test and is preserved for comparison and development recovery; its CDN/mailto limitations make it unsuitable as an asserted verified production rollback.
 
 ## Direct enquiries and attachments
-See [ATTACHMENTS.md](ATTACHMENTS.md) before enabling document uploads. Plain enquiries require an approved privacy policy and authenticated SMTP; enable them in TFE Content. Scanner setup is separate and cannot be assumed from an SMTP test.
+See [ATTACHMENTS.md](ATTACHMENTS.md) before enabling document uploads. Plain enquiries require an approved privacy policy and authenticated SMTP; enable them in TFE Content. Version 0.5.0 supports attachments without antivirus scanning at the user's request. Verify private temporary storage, cleanup and actual attachment receipt before enabling uploads; an SMTP test alone does not establish these checks.
+
