@@ -17,6 +17,7 @@ function tfe_content_page() {
         }
         if ( current_user_can( 'manage_options' ) ) {
             set_theme_mod( 'tfe_enquiries_enabled', isset( $_POST['tfe_enquiries_enabled'] ) && (bool) get_privacy_policy_url() );
+            set_theme_mod( 'tfe_attachments_enabled', isset( $_POST['tfe_attachments_enabled'] ) && (bool) tfe_attachment_ready() && (bool) get_privacy_policy_url() );
         }
         echo '<div class="notice notice-success"><p>Content saved.</p></div>';
     }
@@ -27,6 +28,7 @@ function tfe_content_page() {
     }
     if ( current_user_can( 'manage_options' ) ) {
         echo '<p><label><input type="checkbox" name="tfe_enquiries_enabled" value="1" ' . checked( get_theme_mod( 'tfe_enquiries_enabled', false ), true, false ) . '> Enable server enquiries after SMTP and privacy policy verification</label></p><p>Configure authenticated SMTP in your hosting service or a maintained mail plugin. Never put credentials in the theme. Publish a privacy policy before enabling delivery.</p>';
+        echo '<p><label><input type="checkbox" name="tfe_attachments_enabled" value="1" ' . checked( get_theme_mod( 'tfe_attachments_enabled', false ), true, false ) . ' ' . disabled( (bool) tfe_attachment_ready(), false, false ) . '> Enable scanned document uploads after hosting verification</label></p><p>Requires a host-approved ClamAV executable with current signatures and private storage outside every web root. Uploads fail closed if scanning is unavailable, times out, or rejects a file. Configure TFE_CLAMSCAN_BINARY and TFE_PRIVATE_UPLOAD_DIR in server configuration, never in the theme. Test clean, detected and scanner-failure cases before enabling.</p>';
     }
     submit_button( 'Save TFE content' );
     echo '</form></div>';

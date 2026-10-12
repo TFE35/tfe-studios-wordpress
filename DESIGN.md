@@ -70,3 +70,6 @@ separate camera and subtle idle motion; tap or Enter/Space gives a short yaw and
 returns to its front view. Horizontal drags in that stage do not navigate pages.
 Desktop camera, pointer tracking and animation formulas stay unchanged. Static
 fallback artwork is preserved for reduced motion and unavailable WebGL.
+
+## Contact documents
+Optional native multiple-file picker follows the contact form styles. Inline type/size errors retain visitor input; a live status reports scanning/sending, rejection or mail acceptance. Attachments disabled until configured; the explicit email link remains available. No automatic mail app navigation.

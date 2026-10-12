@@ -3,7 +3,7 @@ Theme Name: TFE Studios Motion
 Theme URI: https://tfestudios.com/
 Author: TFE Studios
 Description: Custom cinematic hash-page WordPress theme, adapted from TFE Studios Three.js Website v3.1. Preserves official logo assets and six hash routes.
-Version: 0.3.1
+Version: 0.4.0
 Requires at least: 6.2
 Requires PHP: 7.4
 Text Domain: tfe-studios-motion
@@ -138,6 +138,14 @@ section.page{animation:none}
 @media(prefers-reduced-motion:reduce){.page-curtain{display:none}.hero-visual canvas{cursor:default}.fade-in{animation:none;opacity:1;transform:none}}
 
 /* Mobile: headline and tap-responsive emblem share one composition. Desktop stays unchanged. */
+.document-upload{margin:28px 0;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.document-upload label span{font-weight:400;color:var(--sub)}
+.document-upload input[type="file"]{width:100%;max-width:100%;font-size:14px;padding:12px 0;min-height:48px;line-height:1.6}
+.document-upload input::file-selector-button{background:var(--pane);color:var(--white);border:1px solid var(--line);padding:12px;margin-right:12px;cursor:pointer}
+.document-upload input::file-selector-button:hover{border-color:var(--gold)}
+.document-upload input:disabled{opacity:.6}
+.document-upload input:disabled::file-selector-button{cursor:default}
+.document-upload .form-note{margin-bottom:0}
 @media(max-width:620px){
  .hero-main{pointer-events:none;min-height:555px}
  .hero-headline{width:75%;font-size:clamp(34px,9.8vw,57px);line-height:1.04;margin-top:48px;margin-bottom:130px;letter-spacing:-.06em;text-shadow:0 2px 3px var(--bg),0 0 14px var(--bg)}

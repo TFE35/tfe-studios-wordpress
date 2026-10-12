@@ -17,3 +17,7 @@ Native theme conversion with CDN Three.js and mailto-only contact. Its supplied 
 # 0.3.0 — 11 October 2026
 
 Mobile headline and logo touch layout; The Studio label and white section; destination-named directional transitions; touchscreen swipes; full-width mobile service categories; inline mobile process detail. Includes the 0.2.1 static-homepage body.page selector fix and browser regression coverage.
+
+## 0.4.0
+- Website enquiries submit directly through WordPress/SMTP; disabled delivery no longer opens a mail draft automatically.
+- Optional bounded uploads with private on-host ClamAV scanning, rejection on incomplete scans, and temporary-file cleanup. Attachments default off pending host verification.

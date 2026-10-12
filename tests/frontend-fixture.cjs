@@ -18,7 +18,7 @@ let form=front.match(/<form id="contactForm"[\s\S]*?<\/form>/)[0].replace(/<\?ph
 html=html.replace(/<form id="contactForm"[\s\S]*?<\/form>/,form).replace('<main id="pages">','<main id="pages" tabindex="-1">');
 html=html.replace('</body>','<script src="/js/app.js"></script><script src="/js/contact.js"></script></body>');
 html=html.replace('</head>','<script>/* fixture configuration only */</script></head>');
-const config={assets:{logo:'/assets/TFE-Studios-Official-Logo.png'},threeUrl:'/js/vendor/three.js',enquiriesEnabled:true,tokenUrl:'/token',enquiryUrl:'/enquiry'};
+const config={assets:{logo:'/assets/TFE-Studios-Official-Logo.png'},threeUrl:'/js/vendor/three.js',enquiriesEnabled:true,attachmentsEnabled:true,tokenUrl:'/token',enquiryUrl:'/enquiry'};
 html=html.replace('<main id="pages" tabindex="-1">','<main id="pages" tabindex="-1" data-tfe-config="'+JSON.stringify(config).replace(/"/g,'&quot;')+'">');
 html=html.replace('<div class="services-cta reveal">','<p id="serviceStatus" role="status"></p><div class="services-cta reveal">');
 const server=http.createServer((req,res)=>{
@@ -50,10 +50,15 @@ const server=http.createServer((req,res)=>{
    await page.locator('.form-submit').click();assert.equal(await page.locator('#contactName').getAttribute('aria-invalid'),'true');
    await page.locator('#contactName').fill('Test visitor');await page.locator('#contactEmail').fill('visitor@example.org');await page.locator('#contactMessage').fill('Local test only');await page.locator('#contactConsent').check();
    await page.route('**/token',r=>r.fulfill({json:{nonce:'fixture-token'}}));
+   await page.locator('#contactDocuments').setInputFiles({name:'unsupported.exe',mimeType:'application/octet-stream',buffer:Buffer.from('fixture')});
+   await page.locator('.form-submit').click();assert.equal(await page.locator('#contactDocuments').getAttribute('aria-invalid'),'true');
+   await page.locator('#contactDocuments').setInputFiles({name:'brief.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4 fixture')});
    await page.route('**/enquiry',r=>r.fulfill({status:502,json:{message:'Mail test failure; use email.'}}));
    await page.locator('.form-submit').click();await page.waitForFunction(()=>document.querySelector('#contactStatus').textContent.includes('Mail test failure'));assert.equal(await page.locator('#contactMessage').inputValue(),'Local test only');
-   await page.unroute('**/enquiry');await page.route('**/enquiry',r=>r.fulfill({json:{message:'Mail service accepted (fixture).'}}));
+   assert.equal(await page.locator('#contactDocuments').evaluate(el=>el.files.length),1);
+   await page.unroute('**/enquiry');await page.route('**/enquiry',r=>{assert.ok(r.request().headers()['content-type'].startsWith('multipart/form-data'));assert.ok(r.request().postDataBuffer().includes(Buffer.from('brief.pdf')));return r.fulfill({json:{message:'Mail service accepted (fixture).'}});});
    await page.locator('.form-submit').click();await page.waitForFunction(()=>document.querySelector('#contactStatus').textContent.includes('Mail service accepted'));assert.equal(await page.locator('#contactMessage').inputValue(),'');
+   assert.equal(await page.locator('#contactDocuments').evaluate(el=>el.files.length),0);
   }
   assert.equal(await page.evaluate(()=>getComputedStyle(document.body).display),'block');
   await page.evaluate(()=>location.hash='about');await page.waitForSelector('#about.is-active');

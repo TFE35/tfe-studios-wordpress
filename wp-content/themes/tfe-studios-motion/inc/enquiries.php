@@ -22,8 +22,9 @@ function tfe_receive_enquiry( $request ) {
     if ( ! get_theme_mod( 'tfe_enquiries_enabled', false ) || ! get_privacy_policy_url() ) {
         return new WP_Error( 'disabled', 'Please use the email link to contact us.', array( 'status' => 503 ) );
     }
-    $data = $request->get_json_params();
-    if ( ! is_array( $data ) || strlen( $request->get_body() ) > 16000 ) {
+    $multipart = stripos( (string) $request->get_header( 'content-type' ), 'multipart/form-data' ) === 0;
+    $data = $multipart ? $request->get_body_params() : $request->get_json_params();
+    if ( ! is_array( $data ) || ( ! $multipart && strlen( $request->get_body() ) > 16000 ) || ( $multipart && isset( $_SERVER['CONTENT_LENGTH'] ) && (int) $_SERVER['CONTENT_LENGTH'] > 9 * 1024 * 1024 ) ) {
         return new WP_Error( 'invalid', 'The enquiry is too large or invalid.', array( 'status' => 400 ) );
     }
     foreach ( array( 'nonce', 'name', 'email', 'service', 'message', 'website', 'consent', 'request_id' ) as $key ) {
@@ -31,6 +32,11 @@ function tfe_receive_enquiry( $request ) {
             return new WP_Error( 'invalid', 'Please complete the enquiry form.', array( 'status' => 400 ) );
         }
     }
+    $text_bytes = 0;
+    foreach ( $data as $value ) { if ( ! is_string( $value ) ) { return new WP_Error( 'invalid', 'Invalid enquiry fields.', array( 'status' => 400 ) ); } $text_bytes += strlen( $value ); }
+    if ( $text_bytes > 16000 ) { return new WP_Error( 'invalid', 'The enquiry is too large.', array( 'status' => 400 ) ); }
+    $entries = tfe_upload_entries( $request->get_file_params() );
+    if ( is_wp_error( $entries ) ) { return $entries; }
     if ( ! wp_verify_nonce( $data['nonce'], 'tfe_enquiry' ) ) {
         return new WP_Error( 'expired', 'Please refresh the page and try again.', array( 'status' => 403 ) );
     }
@@ -74,7 +80,15 @@ function tfe_receive_enquiry( $request ) {
     set_transient( 'tfe_global_mail_rate', (int) get_transient( 'tfe_global_mail_rate' ) + 1, HOUR_IN_SECONDS );
     delete_option( 'tfe_enquiry_rate_lock' );
     $body = "Name: {$name}\nReply email: {$email}\nArea: {$data['service']}\nConsent: visitor agreed to enquiry processing.\n\n{$message}";
-    $sent = wp_mail( $recipient, 'TFE Studios website enquiry', $body, array( 'Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $email ) );
+    $documents = tfe_prepare_documents( $entries );
+    if ( is_wp_error( $documents ) ) { delete_option( $lock ); return $documents; }
+    try {
+        $sent = wp_mail( $recipient, 'TFE Studios website enquiry', $body, array( 'Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $email ), $documents );
+    } catch ( Throwable $error ) {
+        $sent = false;
+    } finally {
+        tfe_delete_documents( $documents );
+    }
     if ( ! $sent ) {
         return new WP_Error( 'mail', 'The mail service could not accept your enquiry. Please use email.', array( 'status' => 502 ) );
     }

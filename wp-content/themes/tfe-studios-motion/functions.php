@@ -5,7 +5,7 @@
  */
 if (!defined('ABSPATH')) { exit; }
 
-define('TFE_THEME_VERSION', '0.3.1');
+define('TFE_THEME_VERSION', '0.4.0');
 
 function tfe_theme_setup() {
     add_theme_support('title-tag');
@@ -149,5 +149,6 @@ function tfe_save_meta($post_id) {
 }
 add_action('save_post', 'tfe_save_meta');
 
+require_once get_theme_file_path( 'inc/attachments.php' );
 require_once get_theme_file_path( 'inc/enquiries.php' );
 require_once get_theme_file_path( 'inc/editor.php' );

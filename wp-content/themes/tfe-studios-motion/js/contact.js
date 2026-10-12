@@ -4,8 +4,10 @@
   if (!form) return;
   const status = document.querySelector('#contactStatus');
   const button = form.querySelector('[type="submit"]');
-  button.disabled = false;
-  if (!window.tfeSite.enquiriesEnabled) button.firstChild.textContent = 'PREPARE EMAIL ';
+  button.disabled = !window.tfeSite.enquiriesEnabled;
+  const documents = form.elements['documents[]'];
+  if (documents) documents.disabled = !window.tfeSite.attachmentsEnabled;
+  if (!window.tfeSite.enquiriesEnabled) status.textContent = 'Website enquiries are not available yet. Please use the direct email link.';
   const fields = ['contactName', 'contactEmail', 'contactMessage', 'contactConsent'];
   form.querySelector('textarea').addEventListener('input', event => {
     event.target.style.height = 'auto';
@@ -22,27 +24,28 @@
       if (invalid && !first) first = field;
     }
     if (first) { first.focus(); status.textContent = 'Check the highlighted fields.'; return; }
+    const files = documents ? [...documents.files] : [];
+    const fileError = files.length > 3 || files.some(file=>file.size<1 || file.size>4*1024*1024 || !/\.(pdf|docx|jpe?g|png)$/i.test(file.name)) || files.reduce((sum,file)=>sum+file.size,0)>8*1024*1024;
+    if(documents){documents.setAttribute('aria-invalid',String(fileError));document.getElementById('contactDocumentsError').textContent=fileError?'Use up to three PDF, DOCX, JPG or PNG files: 4 MB each, 8 MB total.':'';}
+    if(fileError){documents.focus();status.textContent='Check your attachments.';return;}
     if (button.disabled) return;
     if (!window.tfeSite.enquiriesEnabled) {
-      const subject = 'TFE Studios project enquiry — ' + form.elements.service.value;
-      const body = form.elements.message.value.trim() + '\n\nName: ' + form.elements.name.value.trim() + '\nReply to: ' + form.elements.email.value.trim() + '\nProject area: ' + form.elements.service.value;
-      status.textContent = 'Your email app will open a draft. Send it there to contact us.';
-      window.location.href = 'mailto:' + encodeURIComponent(window.tfeSite.email || 'info@tfestudios.com') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      status.textContent = 'Website enquiries are unavailable. Please use the direct email link.';
       return;
     }
     button.disabled = true;
     form.setAttribute('aria-busy', 'true');
-    status.textContent = 'Sending your enquiry…';
+    status.textContent = files.length ? 'Checking your documents and sending your enquiry…' : 'Sending your enquiry…';
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
+    const timeout = setTimeout(() => controller.abort(), files.length ? 90000 : 20000);
     try {
       const token = await fetch(window.tfeSite.tokenUrl, {cache:'no-store',signal:controller.signal});
       if (!token.ok) throw new Error('Please refresh and try again, or use email.');
       const {nonce} = await token.json();
-      const response = await fetch(window.tfeSite.enquiryUrl, {
-        method:'POST', headers:{'Content-Type':'application/json'},signal:controller.signal,
-        body:JSON.stringify({nonce,name:form.elements.name.value.trim(),email:form.elements.email.value.trim(),service:form.elements.service.value,message:form.elements.message.value.trim(),website:form.elements.website.value,consent:form.elements.consent.checked?'yes':'',request_id:form.dataset.requestId || (form.dataset.requestId=crypto.randomUUID())})
-      });
+      const payload={nonce,name:form.elements.name.value.trim(),email:form.elements.email.value.trim(),service:form.elements.service.value,message:form.elements.message.value.trim(),website:form.elements.website.value,consent:form.elements.consent.checked?'yes':'',request_id:form.dataset.requestId || (form.dataset.requestId=crypto.randomUUID())};
+      let requestBody=JSON.stringify(payload),headers={'Content-Type':'application/json'};
+      if(files.length){requestBody=new FormData();for(const [key,value] of Object.entries(payload))requestBody.append(key,value);for(const file of files)requestBody.append('documents[]',file);headers={};}
+      const response = await fetch(window.tfeSite.enquiryUrl, {method:'POST',headers,signal:controller.signal,body:requestBody});
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Please use email to contact us.');
       status.textContent = data.message;
